@@ -1,6 +1,6 @@
 {
-  "name": "Typescript Package Publish Workflow",
-  "description": "Typescript Package Publish Workflow template.",
+  "name": "Loja Integrada Typescript Package Publish",
+  "description": "Loja Integrada Typescript Package Publish.",
   "iconName": "loja-integrada",
   "categories": [
     "TypeScript"

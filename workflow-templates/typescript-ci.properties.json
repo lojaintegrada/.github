@@ -1,6 +1,6 @@
 {
-  "name": "Typescript CI Workflow",
-  "description": "Typescript CI Workflow template.",
+  "name": "Loja Integrada Typescript CI",
+  "description": "Loja Integrada Typescript CI.",
   "iconName": "loja-integrada",
   "categories": [
     "TypeScript"

@@ -1,0 +1,12 @@
+{
+  "name": "Typescript Package Publish Workflow",
+  "description": "Typescript Package Publish Workflow template.",
+  "iconName": "typescript",
+  "categories": [
+    "TypeScript"
+  ],
+  "filePatterns": [
+    "package.json$",
+    "README.md$"
+  ]
+}

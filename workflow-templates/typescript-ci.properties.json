@@ -1,12 +1,11 @@
 {
   "name": "Typescript CI Workflow",
   "description": "Typescript CI Workflow template.",
-  "iconName": "typescript",
+  "iconName": "loja-integrada",
   "categories": [
     "TypeScript"
   ],
   "filePatterns": [
-    "package.json$",
-    "README.md$"
+    "package.json$"
   ]
 }

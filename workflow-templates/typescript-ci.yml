@@ -1,4 +1,4 @@
-name: Typescript CI
+name: Loja Integrada Typescript CI
 
 on:
   pull_request:

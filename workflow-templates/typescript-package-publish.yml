@@ -3,7 +3,9 @@ name: TypeSript Package Publish
 on:
   push:
     tags:
-      - '*'
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+.[0-9]+-dev*"
+      - "[0-9]+.[0-9]+.[0-9]+-qa*"
 
 jobs:
   install-dependencies:
@@ -14,36 +16,36 @@ jobs:
         node-version: [14.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        always-auth: true
-        registry-url: https://npm.pkg.github.com
-        scope: '@lojaintegrada'
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
-    - name: Cache Node.js modules
-      uses: actions/cache@v2
-      with:
-        # npm cache files are stored in `~/.npm` on Linux/macOS
-        path: ~/.npm
-        key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
-          ${{ runner.OS }}-
-    - name: Cache node_modules
-      uses: actions/cache@v2
-      with:
-        path: node_modules
-        key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
-          ${{ runner.OS }}-
-    - run: npm ci
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          always-auth: true
+          registry-url: https://npm.pkg.github.com
+          scope: "@lojaintegrada"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
+      - name: Cache Node.js modules
+        uses: actions/cache@v2
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - name: Cache node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
 
   lint:
     runs-on: ubuntu-latest
@@ -55,25 +57,25 @@ jobs:
         node-version: [14.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js 12.x
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        always-auth: true
-        registry-url: https://npm.pkg.github.com
-        scope: '@lojaintegrada'
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
-    - name: Load node_modules
-      uses: actions/cache@v2
-      with:
-        path: node_modules
-        key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
-          ${{ runner.OS }}-
-    - run: npm run lint
+      - uses: actions/checkout@v2
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          always-auth: true
+          registry-url: https://npm.pkg.github.com
+          scope: "@lojaintegrada"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
+      - name: Load node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - run: npm run lint
 
   test:
     runs-on: ubuntu-latest
@@ -85,25 +87,25 @@ jobs:
         node-version: [14.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        always-auth: true
-        registry-url: https://npm.pkg.github.com
-        scope: '@lojaintegrada'
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
-    - name: Load node_modules
-      uses: actions/cache@v2
-      with:
-        path: node_modules
-        key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
-          ${{ runner.OS }}-
-    - run: npm test
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          always-auth: true
+          registry-url: https://npm.pkg.github.com
+          scope: "@lojaintegrada"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
+      - name: Load node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - run: npm test
 
   build:
     runs-on: ubuntu-latest
@@ -115,30 +117,30 @@ jobs:
         node-version: [14.x]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-        always-auth: true
-        registry-url: https://npm.pkg.github.com
-        scope: '@lojaintegrada'
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
-    - name: Load node_modules
-      uses: actions/cache@v2
-      with:
-        path: node_modules
-        key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.OS }}-node-
-          ${{ runner.OS }}-
-    - run: npm run build
-    - name: Upload output file
-      uses: actions/upload-artifact@v2
-      with:
-        name: dist
-        path: dist
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+          always-auth: true
+          registry-url: https://npm.pkg.github.com
+          scope: "@lojaintegrada"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
+      - name: Load node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+            ${{ runner.OS }}-
+      - run: npm run build
+      - name: Upload output file
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
 
   publish-github-package:
     needs: [build, test, lint]
@@ -149,7 +151,7 @@ jobs:
         with:
           node-version: 14
           registry-url: https://npm.pkg.github.com/
-          scope: '@lojaintegrada'
+          scope: "@lojaintegrada"
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Download dist
@@ -160,3 +162,102 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  push-ecr-image:
+    needs: publish-github-package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Define branch/tag sources
+        id: sources
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push image to Amazon ECR
+        env:
+          NODE_ENV: development
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ github.event.repository.name }}
+          IMAGE_TAG: ${{ steps.sources.outputs.SOURCE_TAG }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg ENV=$NODE_ENV --build-arg NODE_AUTH_TOKEN=$NODE_AUTH_TOKEN .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  update-gitops-version:
+    needs: push-ecr-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Define branch/tag sources
+        id: sources
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Update gitops-k8s image version
+        env:
+          GITFLOW_ACCESS_TOKEN: ${{ secrets.GITFLOW_ACCESS_TOKEN }}
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          DEPLOY_REPOSITORY: github.com/lojaintegrada/gitops-k8s
+          DEPLOY_BRANCH: master
+          IMAGE_TAG: ${{ steps.sources.outputs.SOURCE_TAG }}
+          DEPLOYMENT_NAME: ${{ github.event.repository.name }}
+          IMAGE_NAME_TAG: "${{ secrets.AWS_ECR_REGISTRY }}/${{ github.event.repository.name }}:${{ steps.sources.outputs.SOURCE_TAG }}"
+          BUILD_NUMBER: ${{ github.run_number }}
+          RUN_DISPLAY_URL: "https://github.com/lojaintegrada/${{ github.event.repository.name }}/actions/runs/${{ github.run_id }}"
+          DEPLOYMENT_FILE_PROD: "apps/production/apps/${{ github.event.repository.name }}/deployment.yaml"
+          DEPLOYMENT_FILE_DEV: "apps/${{ github.event.repository.name }}/deployment.yaml"
+        run: |
+          docker run \
+            -e MY_SECRET_GIT_TOKEN=$GITFLOW_ACCESS_TOKEN \
+            -e DEPLOY_REPOSITORY=$DEPLOY_REPOSITORY \
+            -e IMAGE_TAG=$IMAGE_TAG \
+            -e DEPLOYMENT_NAME=$DEPLOYMENT_NAME \
+            -e IMAGE_NAME_TAG=$IMAGE_NAME_TAG \
+            -e BUILD_NUMBER=$BUILD_NUMBER \
+            -e DEPLOY_BRANCH=$DEPLOY_BRANCH \
+            -e DEPLOYMENT_FILE_PROD=$DEPLOYMENT_FILE_PROD \
+            -e DEPLOYMENT_FILE_DEV=$DEPLOYMENT_FILE_DEV \
+            -e RUN_DISPLAY_URL=$RUN_DISPLAY_URL \
+            $ECR_REGISTRY/deployer:latest ./deploy.sh
+
+  notify-slack:
+    needs: update-gitops-version
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: li-k8s-notifications
+          SLACK_USERNAME: ${{ github.event.repository.name }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_ICON: https://lojaintegrada.com.br/site/wp-content/uploads/2018/08/cropped-logo-192x192.png
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_FOOTER: ''

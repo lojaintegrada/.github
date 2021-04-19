@@ -2,7 +2,7 @@ name: Typescript CI
 
 on:
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ master ]
 
 jobs:
   install-dependencies:
@@ -131,3 +131,20 @@ jobs:
           ${{ runner.OS }}-node-
           ${{ runner.OS }}-
     - run: npm run build
+
+  notify-slack:
+    needs: build
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: li-k8s-notifications
+          SLACK_USERNAME: ${{ github.event.repository.name }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_ICON: https://lojaintegrada.com.br/site/wp-content/uploads/2018/08/cropped-logo-192x192.png
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_FOOTER: ''

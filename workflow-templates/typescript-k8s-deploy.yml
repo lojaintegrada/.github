@@ -1,10 +1,11 @@
-name: TypeSript Package Publish
+name: TypeSript App Kubernetes Deploy
 
 on:
   push:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
-      - "[0-9]+.[0-9]+.[0-9]+-rc*"
+      - "[0-9]+.[0-9]+.[0-9]+-dev*"
+      - "[0-9]+.[0-9]+.[0-9]+-qa*"
 
 jobs:
   install-dependencies:
@@ -161,6 +162,88 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  push-ecr-image:
+    needs: publish-github-package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Define branch/tag sources
+        id: sources
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push image to Amazon ECR
+        env:
+          NODE_ENV: development
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ github.event.repository.name }}
+          IMAGE_TAG: ${{ steps.sources.outputs.SOURCE_TAG }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg ENV=$NODE_ENV --build-arg NODE_AUTH_TOKEN=$NODE_AUTH_TOKEN .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  update-gitops-version:
+    needs: push-ecr-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Define branch/tag sources
+        id: sources
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Update gitops-k8s image version
+        env:
+          GITFLOW_ACCESS_TOKEN: ${{ secrets.GITFLOW_ACCESS_TOKEN }}
+          ECR_REGISTRY: ${{ secrets.AWS_ECR_REGISTRY }}
+          DEPLOY_REPOSITORY: github.com/lojaintegrada/gitops-k8s
+          DEPLOY_BRANCH: master
+          IMAGE_TAG: ${{ steps.sources.outputs.SOURCE_TAG }}
+          DEPLOYMENT_NAME: ${{ github.event.repository.name }}
+          IMAGE_NAME_TAG: "${{ secrets.AWS_ECR_REGISTRY }}/${{ github.event.repository.name }}:${{ steps.sources.outputs.SOURCE_TAG }}"
+          BUILD_NUMBER: ${{ github.run_number }}
+          RUN_DISPLAY_URL: "https://github.com/lojaintegrada/${{ github.event.repository.name }}/actions/runs/${{ github.run_id }}"
+          DEPLOYMENT_FILE_PROD: "apps/production/apps/${{ github.event.repository.name }}/deployment.yaml"
+          DEPLOYMENT_FILE_DEV: "apps/${{ github.event.repository.name }}/deployment.yaml"
+        run: |
+          docker run \
+            -e MY_SECRET_GIT_TOKEN=$GITFLOW_ACCESS_TOKEN \
+            -e DEPLOY_REPOSITORY=$DEPLOY_REPOSITORY \
+            -e IMAGE_TAG=$IMAGE_TAG \
+            -e DEPLOYMENT_NAME=$DEPLOYMENT_NAME \
+            -e IMAGE_NAME_TAG=$IMAGE_NAME_TAG \
+            -e BUILD_NUMBER=$BUILD_NUMBER \
+            -e DEPLOY_BRANCH=$DEPLOY_BRANCH \
+            -e DEPLOYMENT_FILE_PROD=$DEPLOYMENT_FILE_PROD \
+            -e DEPLOYMENT_FILE_DEV=$DEPLOYMENT_FILE_DEV \
+            -e RUN_DISPLAY_URL=$RUN_DISPLAY_URL \
+            $ECR_REGISTRY/deployer:latest ./deploy.sh
 
   notify-slack:
     needs: update-gitops-version

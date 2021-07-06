@@ -1,0 +1,11 @@
+{
+  "name": "Loja Integrada Typescript Kubernetes Deploy",
+  "description": "Loja Integrada typescript kubernetes publish and deploy",
+  "iconName": "loja-integrada",
+  "categories": [
+    "TypeScript"
+  ],
+  "filePatterns": [
+    "package.json$"
+  ]
+}

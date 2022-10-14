@@ -1,0 +1,10 @@
+name: Build IaC
+
+on:
+  pull_request:
+    types: ['opened', 'reopened', 'closed', 'synchronize']
+
+jobs:
+  run-reusable-workflow:
+    uses: lojaintegrada/reusable-workflows/.github/workflows/deploy-iac.yml@main
+    secrets: inherit

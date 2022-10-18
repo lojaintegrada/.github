@@ -1,0 +1,12 @@
+name: Build Publish Deploy Update
+
+on:
+  push:
+    tags:
+      - "dev-[a-zA-Z]*"
+      - "[0-9]+.[0-9]+.[0-9]+-staging*"
+
+jobs:
+  run-reusable-workflow:
+    uses: lojaintegrada/reusable-workflows/.github/workflows/deploy.yml@main
+    secrets: inherit
